@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import math
 import xml.dom.minidom
+import os
 
 wall_count = 0
 
@@ -45,6 +46,13 @@ def add_wall(parent,x,y,z=0, r1=0, r2=0, r3=0):
     global wall_count
     add_include_object(parent, "brick_box_3x1x3", f"wall{wall_count}", pose)
     wall_count += 1
+
+def add_aruco_marker(parent, id, x,y,z, r1=0, r2=0, r3=0):
+    model = ET.SubElement(parent, 'model')
+    model.set('name', f'aruco_visual_marker_{id}')
+    pose_xml = ET.SubElement(model, 'pose')
+    pose_xml.text = " ".join(str(x) for x in [x,y,z,r1,r2,r3])
+    add_include_object(model, f'aruco_visual_marker_{id}')
 
 def write_xml_file(xml_data, file_name):
     """
@@ -95,5 +103,8 @@ if __name__ == "__main__":
     sdf.set('version', '1.5')
     world = setup_world(sdf)
 
-    add_walls(world, "final.txt")
-    write_xml_file(sdf, "custom_world.world")
+    add_aruco_marker(world, 2, 0,15,5,degrees_to_radians(90))
+    current_dir = os.path.split(__file__)[0]
+    add_walls(world, os.path.join(current_dir, "final.txt"))
+    worlds_dir = "/home/nikhil/Documents/CS4610/cs4610-final-project/worlds/"
+    write_xml_file(sdf, os.path.join(worlds_dir, "custom_world.world"))

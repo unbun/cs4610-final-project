@@ -6,3 +6,6 @@ university robotics course.
 
 This requires [Gazebo](http://gazebosim.org/) and is intended to work on a
 (non-virtualized) Ubuntu 20.04 or Debian 10 system.
+
+# References
+- https://github.com/joselusl/aruco_gazebo
