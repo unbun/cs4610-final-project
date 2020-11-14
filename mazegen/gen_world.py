@@ -103,7 +103,7 @@ if __name__ == "__main__":
     sdf.set('version', '1.5')
     world = setup_world(sdf)
 
-    add_aruco_marker(world, 2, 0,15,5,degrees_to_radians(90))
+    add_aruco_marker(world, 0, 0, 19.4, 1, degrees_to_radians(90))
     current_dir = os.path.split(__file__)[0]
     add_walls(world, os.path.join(current_dir, "final.txt"))
     worlds_dir = "/home/nikhil/Documents/CS4610/cs4610-final-project/worlds/"
