@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <time.h>
+#include <vector>
 
 #include "robot.hh"
 #include "cam.hh"
@@ -9,7 +10,7 @@ using namespace std;
 
 void callback(Robot* robot)
 {
-    cam_show(robot->frame);
+    detect_markers(robot->frame);
     robot->set_vel(0.0, 0.0);
 }
 

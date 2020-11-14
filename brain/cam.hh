@@ -7,5 +7,5 @@
 typedef std::pair<int, int> Posn; 
 void cam_init();
 void cam_show(cv::Mat);
-
+void detect_markers(cv::Mat frame);
 #endif
