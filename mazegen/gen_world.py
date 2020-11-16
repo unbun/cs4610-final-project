@@ -111,5 +111,5 @@ if __name__ == "__main__":
 
     current_dir = os.path.split(__file__)[0]
     add_walls(world, os.path.join(current_dir, "final.txt"))
-    worlds_dir = "/home/Desktop/CS4610/project/cs4610-final-project/worlds/"
-    write_xml_file(sdf, os.path.join(current_dir, "custom_world.world"))
+    worlds_dir = "../worlds/"
+    write_xml_file(sdf, os.path.join(worlds_dir, "custom_world.world"))
