@@ -24,6 +24,7 @@ double
 clamp(double xmin, double xx, double xmax)
 {
     if (xx < xmin) return xmin;
+    if (xx > xmax) return xmax;
     return xx;
 }
 
@@ -99,12 +100,11 @@ Robot::done()
 void
 Robot::set_vel(double lvel, double rvel)
 {
-    // cout << "Printing message!\n";
     auto r_error = lvel * ((rand() % 21) - 10) * 0.01;
     auto l_error = rvel * ((rand() % 21) - 10) * 0.01;
 
-    lvel = clamp(-4, lvel + l_error, 4);
-    rvel = clamp(-4, rvel + r_error, 4);
+    lvel = clamp(-4, lvel, 4);
+    rvel = clamp(-4, rvel, 4);
 
     //cout << "set_vel: " << lvel << "," << rvel << endl;
     int xx = 128 + int(lvel * 25.0);
@@ -120,8 +120,7 @@ Robot::on_scan(ConstSonarStampedPtr &msg)
     // cout << "Receiving the Sonar message from Sonar Sensor" << endl;
     msgs::Sonar sonar = msg->sonar();
     double hit_range = sonar.range();
-    this->range = hit_range;
-    // cout <<  "Value: " << hit_range << endl;
+    range = hit_range;
 
     this->on_update(this);
 }
@@ -146,8 +145,8 @@ Robot::on_frame(ConstImageStampedPtr &msg)
 void
 Robot::on_pose(ConstPoseStampedPtr &msg)
 {
-    auto x_error = ((rand() % 21) - 10) * 0.02;
-    auto y_error = ((rand() % 21) - 10) * 0.02;
+    auto x_error = 0;
+    auto y_error = 0;
 
     auto pos = msg->pose().position();
     this->pos_x = pos.x() + x_error;
