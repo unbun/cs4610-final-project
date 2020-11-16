@@ -2,10 +2,9 @@ import xml.etree.ElementTree as ET
 import math
 import xml.dom.minidom
 import os
+import random
 
 wall_count = 0
-
-
 
 def degrees_to_radians(degrees):
     """
@@ -94,13 +93,15 @@ def add_walls(parent, filename):
         walls = f.read()
     walls = walls.split("\n")
 
+    aruco_order = list(range(6))
+    random.shuffle(aruco_order)
     aruco_count = 0
 
     for i,row in enumerate(walls, -len(walls)//2):
         for j, val in enumerate(row, -len(walls)//2):
             if val in direction_to_position and (i or j):
                 angle, shift = direction_to_position[val]
-                add_aruco_marker(parent, aruco_count, i*2-shift, j*2, r3=degrees_to_radians(angle))
+                add_aruco_marker(parent, aruco_order[aruco_count], i*2-shift, j*2, r3=degrees_to_radians(angle))
                 aruco_count = aruco_count + 1
 
 if __name__ == "__main__":
