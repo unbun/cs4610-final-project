@@ -5,6 +5,8 @@ import os
 
 wall_count = 0
 
+
+
 def degrees_to_radians(degrees):
     """
     Converts a value in degrees to radians
@@ -47,7 +49,7 @@ def add_wall(parent,x,y,z=0, r1=0, r2=0, r3=0):
     add_include_object(parent, "brick_box_3x1x3", f"wall{wall_count}", pose)
     wall_count += 1
 
-def add_aruco_marker(parent, id, x,y,z, r1=0, r2=0, r3=0):
+def add_aruco_marker(parent, id, x,y,z=0, r1=0, r2=0, r3=0):
     model = ET.SubElement(parent, 'model')
     model.set('name', f'aruco_visual_marker_{id}')
     pose_xml = ET.SubElement(model, 'pose')
@@ -92,19 +94,29 @@ def add_walls(parent, filename):
         walls = f.read()
     walls = walls.split("\n")
 
+    aruco_count = 0
+
     for i,row in enumerate(walls, -len(walls)//2):
         for j, val in enumerate(row, -len(walls)//2):
             if val in direction_to_position and (i or j):
                 angle, shift = direction_to_position[val]
-                add_wall(parent, i*2-shift, j*2, r3=degrees_to_radians(angle))
+                add_aruco_marker(parent, aruco_count, i*2-shift, j*2, r3=degrees_to_radians(angle))
+                aruco_count = aruco_count + 1
 
 if __name__ == "__main__":
     sdf = ET.Element('sdf')
     sdf.set('version', '1.5')
     world = setup_world(sdf)
 
-    add_aruco_marker(world, 0, 0, 19.4, 1, degrees_to_radians(90))
+    # add_aruco_marker(world, 0, -24, -2, 0, 0, 0, 1.5707963267948966)
+    # add_aruco_marker(world, 1, 15, -16, 0, 0, 0, -0.7853981633974483)
+    # add_aruco_marker(world, 2, -15, 14, 0, 0, 0, 0.7853981633974483)
+    # add_aruco_marker(world, 3, 9, -18, 0, 0, 0, 0.7853981633974483)
+    # add_aruco_marker(world, 4, 9, 12, 0, 0, 0, 0.7853981633974483)
+    # add_aruco_marker(world, 5, 20, -2, 0, 0, 0, 1.5707963267948966)
+
+
     current_dir = os.path.split(__file__)[0]
     add_walls(world, os.path.join(current_dir, "final.txt"))
-    worlds_dir = "/home/nikhil/Documents/CS4610/cs4610-final-project/worlds/"
-    write_xml_file(sdf, os.path.join(worlds_dir, "custom_world.world"))
+    worlds_dir = "/home/Desktop/CS4610/project/cs4610-final-project/worlds/"
+    write_xml_file(sdf, os.path.join(current_dir, "custom_world.world"))
