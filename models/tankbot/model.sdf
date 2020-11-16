@@ -144,12 +144,12 @@
       </visual>
     </link>
     
-    <joint name="chain_up_joint" type="fixed">
-      <parent>chain_l_up</parent>
+    <joint name="chain_up_joint" type="revolute">
+      <parent>chassis</parent>
       <child>chain_r_up</child>
     </joint>
     
-    <joint name="chain_up_2_joint" type="fixed">
+    <joint name="chain_up_2_joint" type="revolute">
       <parent>chassis</parent>
       <child>chain_l_up</child>
     </joint>
