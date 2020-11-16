@@ -108,14 +108,6 @@ if __name__ == "__main__":
     sdf.set('version', '1.5')
     world = setup_world(sdf)
 
-    # add_aruco_marker(world, 0, -24, -2, 0, 0, 0, 1.5707963267948966)
-    # add_aruco_marker(world, 1, 15, -16, 0, 0, 0, -0.7853981633974483)
-    # add_aruco_marker(world, 2, -15, 14, 0, 0, 0, 0.7853981633974483)
-    # add_aruco_marker(world, 3, 9, -18, 0, 0, 0, 0.7853981633974483)
-    # add_aruco_marker(world, 4, 9, 12, 0, 0, 0, 0.7853981633974483)
-    # add_aruco_marker(world, 5, 20, -2, 0, 0, 0, 1.5707963267948966)
-
-
     current_dir = os.path.split(__file__)[0]
     add_walls(world, os.path.join(current_dir, "final.txt"))
     worlds_dir = "/home/Desktop/CS4610/project/cs4610-final-project/worlds/"
