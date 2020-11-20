@@ -1,5 +1,8 @@
 #include <vector>
 #include <iostream>
+#include <map> 
+#include <math.h>
+#include <algorithm>
 
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
@@ -28,28 +31,39 @@ void cam_show(Mat frame)
 
 }
 
-vector<Posn> get_marker_centers(std::vector<std::vector<cv::Point2f>> markerCorners) {
-    vector<Posn> centers;
-    for (int i = 0; i < markerCorners.size(); i++) {
-        Posn c = Posn(0,0);
-        for (int j = 0; j < markerCorners.at(i).size(); j++) {
-            c.first += markerCorners.at(i).at(j).x;
-            c.second += markerCorners.at(i).at(j).y;
-        }
-        c.first = c.first/4;
-        c.second = c.second/4;
-        centers.push_back(c);
+Posn get_marker_center(std::vector<cv::Point2f> markerCorners) {
+    Posn c = Posn(0,0);
+    for (int j = 0; j < markerCorners.size(); j++) {
+        c.first += markerCorners.at(j).x;
+        c.second += markerCorners.at(j).y;
     }
+    c.first = c.first/4;
+    c.second = c.second/4;
 
-    return centers;
+    return c;
 
+}
+
+
+float distance_formula(cv::Point2f p1, cv::Point2f p2) {
+    float dx = p1.x - p2.x;
+    float dy = p1.y - p2.y;
+    return sqrt(pow(dx,2)+pow(dy,2));
+}
+
+float get_marker_size(std::vector<cv::Point2f> markerCorners) {
+    return max(distance_formula(markerCorners.at(0), markerCorners.at(2)),
+                distance_formula(markerCorners.at(1), markerCorners.at(3)));
 }
 
 cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
 cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-void detect_markers(Mat frame) {
+
+map<int, pair<Posn, float>> detect_markers(Mat frame) {
+    map<int, pair<Posn, float>> marker_id_to_info;
+    
     if (frame.size().width < 1) {
-        return;
+        return marker_id_to_info;
     }
     cv::Mat greyMat;
     cv::cvtColor(frame, greyMat, cv::COLOR_BGR2GRAY);
@@ -59,9 +73,17 @@ void detect_markers(Mat frame) {
     cv::aruco::detectMarkers(greyMat, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
     cv::Mat outputImage = greyMat.clone();
     cv::aruco::drawDetectedMarkers(outputImage, markerCorners, markerIds);
-    vector<Posn> centers = get_marker_centers(markerCorners);
-    for (int i = 0; i < centers.size(); i++) {
-        printf("\nMarker: %d\n\tx: %f\n\ty: %f\n", markerIds.at(i), centers.at(i).first, centers.at(i).second);
+    
+    for (int i = 0; i < markerIds.size(); i++) {
+        marker_id_to_info.insert(
+            pair<int, pair<Posn, int>>(
+                markerIds.at(i), 
+                pair<Posn, int>(
+                    get_marker_center(markerCorners.at(i)),
+                    get_marker_size(markerCorners.at(i))
+                )
+            )
+        );
     }
 
     if (markerIds.size() > 0) {
@@ -70,4 +92,5 @@ void detect_markers(Mat frame) {
         imshow("camera", greyMat);
     }
     cv::waitKey(1);
+    return marker_id_to_info;
 }
