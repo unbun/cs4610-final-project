@@ -10,74 +10,57 @@
 using namespace std;
 using std::vector;
 
-map<int, pair<Posn, float>> marker_id_to_info;
-vector <int> IDs{6, 5, 4, 3, 2, 1, 0};
+float maxSpeed = 10.0f;
+float turnSpeed = 7.0f;
+float minSpeed = -10.0f;
 
-void print_map() {
-    map<int, pair<Posn, float>>::iterator itr; 
-    cout << "\nDetected Markers\n";
-    for (itr = marker_id_to_info.begin(); itr != marker_id_to_info.end(); ++itr) { 
-        printf("ID: %d\n\tSize: %.2f\n\tPos: (%.2f, %.2f)\n", 
-        itr->first, itr->second.second, itr->second.first.first, itr->second.first.second);
-    } 
-}
+int FORWARD = 0;
+int BACKWARDS = 1;
+int LEFT = 2;
+int RIGHT = 3;
+int driveDir = 0;
 
-bool detected_target_id(int target_id) {
-	
-	map<int, pair<Posn, float>>::iterator itr; 
-    for (itr = marker_id_to_info.begin(); itr != marker_id_to_info.end(); ++itr) { 
-		if (itr->first == target_id)	
-		{
-			return true;
-		}
-    } 
-	
-	return false;
-}
+// void moveInDir(int newDir) {
+// 	if(driveDir == FORWARD){
+// 		if(newDir == )
+// 	}
+// }
 
 void callback(Robot* robot)
 {
-    marker_id_to_info = detect_markers(robot->frame);
-    //print_map();
+	//https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
+	// stty raw will read stdin without needing to hit enter
+    system("stty raw");
+    printf("input-> ");
 
-	// current target aruco ID
-	float target_id = IDs.back();
-	cout << "target_id: " << target_id <<endl;
+    char ch = getchar();
 
-	// if the ID is not detected keep rotating
-	if (!detected_target_id(target_id))
-	{
-		robot->set_vel(-1, -1);
-	}
+    if(ch=='~') {         // kill on '~'
+        system("stty cooked");
+        exit(0);
+    }
 
-	Posn target_pos = marker_id_to_info[target_id].first; // target position
-	float target_diag = marker_id_to_info[target_id].second; // target aruco diagonal length
+    // stty raw doesn't use the new line character correctly
+    system("stty cooked");
+    printf("\nyou pressed %c",ch);
+    if(ch == 'w') {
+    	printf("\tFORWARD\n");
+    	robot->set_vel(maxSpeed, maxSpeed);
 
-	// if  the target diagonal size is more than a threshold, pop the target ID and go to the next one	
-	if (target_diag > 300)
-	{
-		IDs.pop_back();
-	}
+    } else if(ch == 's') {
+    	printf("\tBACKWARDS\n");
+    	robot->set_vel(minSpeed, minSpeed);
 
-	printf("target pos: %.2f, %.2f)\n", target_pos.first, target_pos.second);
-	// go to ID 1
-	cout << "dim: " <<  target_pos.first - robot->frame.size().width/2 << endl;
-	cout << "width: " << robot->frame.size().width << endl;
-	if (target_pos.first - robot->frame.size().width/2 > 10)
-	{
-		robot->set_vel(1, -1);
-	}
+    } else if(ch == 'a') {
+    	printf("\tLEFT\n");
+    	robot->set_vel(turnSpeed, 0);
 
-	if (target_pos.first - robot->frame.size().width/2 < -10)
-	{
-		robot->set_vel(-1, 1);
-	}
-
-	else
-	{
-		robot->set_vel(2, 2);
-
-	}
+    } else if(ch == 'd'){
+    	printf("\tRIGHT\n");
+    	robot->set_vel(0, turnSpeed);
+    } else {
+    	printf("\n");
+    }
 }
 
 int
@@ -88,7 +71,9 @@ main(int argc, char* argv[])
 
     cout << "making robot" << endl;
     Robot robot(argc, argv, callback);
+
     robot.do_stuff();
 
+    system("stty cooked"); 
     return 0;
 }
