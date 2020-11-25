@@ -3,8 +3,13 @@
 #include <time.h>
 #include <vector>
 #include <map>
+#include <fstream>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string>
 
-#include "robot.hh"
 #include "cam.hh"
 
 using namespace std;
@@ -12,6 +17,7 @@ using std::vector;
 
 map<int, pair<Posn, float>> marker_id_to_info;
 vector <int> IDs{6, 5, 4, 3, 2, 1, 0};
+
 
 void print_map() {
     map<int, pair<Posn, float>>::iterator itr; 
@@ -35,9 +41,9 @@ bool detected_target_id(int target_id) {
 	return false;
 }
 
-void callback(Robot* robot)
+string callback(cv::Mat frame)
 {
-    marker_id_to_info = detect_markers(robot->frame);
+	marker_id_to_info = detect_markers(frame);
     //print_map();
 
 	// current target aruco ID
@@ -47,7 +53,9 @@ void callback(Robot* robot)
 	// if the ID is not detected keep rotating
 	if (!detected_target_id(target_id))
 	{
-		robot->set_vel(-1, -1);
+		cout << "not detected: turning" << endl;
+		
+		//robot->set_vel(-1, -1);
 	}
 
 	Posn target_pos = marker_id_to_info[target_id].first; // target position
@@ -61,21 +69,31 @@ void callback(Robot* robot)
 
 	printf("target pos: %.2f, %.2f)\n", target_pos.first, target_pos.second);
 	// go to ID 1
-	cout << "dim: " <<  target_pos.first - robot->frame.size().width/2 << endl;
-	cout << "width: " << robot->frame.size().width << endl;
-	if (target_pos.first - robot->frame.size().width/2 > 10)
+	//cout << "dim: " <<  target_pos.first - robot->frame.size().width/2 << endl;
+	//cout << "width: " << robot->frame.size().width << endl;
+	if (target_pos.first - frame.size().width/2 > 10)
 	{
-		robot->set_vel(1, -1);
+		cout << "turing right" << endl;
+		//robot->set_vel(1, -1);
+		return "1 -1";
 	}
 
-	if (target_pos.first - robot->frame.size().width/2 < -10)
+	if (target_pos.first - frame.size().width/2 < -10)
 	{
-		robot->set_vel(-1, 1);
+		cout << "turning left" << endl;
+		return "-1 1";
+		//robot->set_vel(-1, 1);
+		/* remove the FIFO */
+
 	}
 
 	else
 	{
-		robot->set_vel(2, 2);
+		cout << "found: going straight" << endl;
+
+		return "2 2";
+
+		//robot->set_vel(2, 2);
 
 	}
 }
@@ -83,12 +101,43 @@ void callback(Robot* robot)
 int
 main(int argc, char* argv[])
 {
+	cv::VideoCapture inputVideo;
+	inputVideo.open("https://172.20.10.11:8080/video");
+	
+	cv::Mat frame;
+
     cout << "here1" <<endl;
     cam_init();
 
-    cout << "making robot" << endl;
-    Robot robot(argc, argv, callback);
-    robot.do_stuff();
+	int fd; 
+  
+    // FIFO file path 
+    char * myfifo = "/tmp/myfifo"; 
+  
+    // Creating the named file(FIFO) 
+    // mkfifo(<pathname>, <permission>) 
+    mkfifo(myfifo, 0666); 
+
+    while (inputVideo.grab()) 
+    { 
+		inputVideo.read(frame);
+        // Open FIFO for write only 
+        fd = open(myfifo, O_WRONLY); 
+  
+        // Take an input arr2ing from user. 
+        // 80 is maximum length 
+		std::string str = callback(frame);
+		char* arr2 = new char[str.size() + 1];
+		std::copy(str.begin(), str.end(), arr2);
+		arr2[str.size()] = '\0';
+  
+        // Write the input arr2ing on FIFO 
+        // and close it 
+        write(fd, arr2, strlen(arr2)+1); 
+        close(fd); 
+  }
+    //Robot robot(argc, argv, callback);
+    //robot.do_stuff();
 
     return 0;
 }

@@ -1,13 +1,8 @@
-#include <vector>
-#include <iostream>
-#include <map> 
-#include <math.h>
-#include <algorithm>
-
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 #include <opencv2/aruco.hpp>
+#include <iostream>
 
 #include "cam.hh"
 
@@ -61,23 +56,23 @@ cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameter
 
 map<int, pair<Posn, float>> detect_markers(Mat frame) {
     map<int, pair<Posn, float>> marker_id_to_info;
-    
+
     if (frame.size().width < 1) {
         return marker_id_to_info;
     }
     cv::Mat greyMat;
     cv::cvtColor(frame, greyMat, cv::COLOR_BGR2GRAY);
-    
+
     std::vector<int> markerIds;
     std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
     cv::aruco::detectMarkers(greyMat, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
     cv::Mat outputImage = greyMat.clone();
     cv::aruco::drawDetectedMarkers(outputImage, markerCorners, markerIds);
-    
+
     for (int i = 0; i < markerIds.size(); i++) {
         marker_id_to_info.insert(
             pair<int, pair<Posn, int>>(
-                markerIds.at(i), 
+                markerIds.at(i),
                 pair<Posn, int>(
                     get_marker_center(markerCorners.at(i)),
                     get_marker_size(markerCorners.at(i))
@@ -94,3 +89,4 @@ map<int, pair<Posn, float>> detect_markers(Mat frame) {
     cv::waitKey(1);
     return marker_id_to_info;
 }
+   
