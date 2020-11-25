@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>
 #include <map>
+#include <gazebo/msgs/msgs.hh>
 
 #include "robot.hh"
 #include "cam.hh"
@@ -14,17 +15,51 @@ float maxSpeed = 10.0f;
 float turnSpeed = 7.0f;
 float minSpeed = -10.0f;
 
-int FORWARD = 0;
-int BACKWARDS = 1;
-int LEFT = 2;
-int RIGHT = 3;
-int driveDir = 0;
+// BUGFIX: the actual set_vel call happens when you'd expect it to,
+// but the vel_cmd Publisher node seems to be getting its message after a small delay _sometimes_
 
-// void moveInDir(int newDir) {
-// 	if(driveDir == FORWARD){
-// 		if(newDir == )
-// 	}
-// }
+void drive(Robot* robot, char cmd) {
+	switch(cmd){
+		case 'w': 
+			printf(":\tforward\n");
+	    	robot->set_vel(maxSpeed, maxSpeed); 
+	    	break;
+
+    	case 's':
+			printf(":\treverse\n");
+	    	robot->set_vel(minSpeed, minSpeed); 
+	    	break;
+
+	    case ' ':
+			printf(":\tstop\n");
+	    	robot->set_vel(0.0, 0.0); 
+	    	break;
+
+	    case 'a':
+			printf(":\tleft\n");
+	    	robot->set_vel(0.0, turnSpeed); 
+	    	break;
+
+	    case 'd':
+			printf(":\tright\n");
+	    	robot->set_vel(turnSpeed, 0.0); 
+	    	break;
+
+	    case 'q':
+			printf(":\trspin left\n");
+	    	robot->set_vel(-turnSpeed, turnSpeed); 
+	    	break;
+
+	    case 'e':
+			printf(":\trspin right\n");
+	    	robot->set_vel(turnSpeed, -turnSpeed); 
+	    	break;
+
+	    default:
+	    	printf("\n");
+	    	break;
+	}
+}
 
 void callback(Robot* robot)
 {
@@ -37,30 +72,13 @@ void callback(Robot* robot)
 
     if(ch=='~') {         // kill on '~'
         system("stty cooked");
-        exit(0);
+        exit(0); // /BUGFIX: maybe do this more gracefully?
     }
 
     // stty raw doesn't use the new line character correctly
     system("stty cooked");
-    printf("\nyou pressed %c",ch);
-    if(ch == 'w') {
-    	printf("\tFORWARD\n");
-    	robot->set_vel(maxSpeed, maxSpeed);
-
-    } else if(ch == 's') {
-    	printf("\tBACKWARDS\n");
-    	robot->set_vel(minSpeed, minSpeed);
-
-    } else if(ch == 'a') {
-    	printf("\tLEFT\n");
-    	robot->set_vel(turnSpeed, 0);
-
-    } else if(ch == 'd'){
-    	printf("\tRIGHT\n");
-    	robot->set_vel(0, turnSpeed);
-    } else {
-    	printf("\n");
-    }
+	drive(robot, ch);
+    return;
 }
 
 int
