@@ -11,7 +11,6 @@ parameters = aruco.DetectorParameters_create()
 
 target_ids = [5, 4, 3, 2, 1, 0]
 
-
 def get_center(corner):
     return np.mean(corner[0], axis=0)
 
@@ -48,6 +47,10 @@ def detect_markers(frame):
 turning_flag = False
 straight_flag = False
 
+# 0 = turning
+# 1 = go straight
+bot_state = 0
+
 if __name__ == "__main__":
 
     bot = mBot()
@@ -56,6 +59,12 @@ if __name__ == "__main__":
     vid = cv2.VideoCapture('https://192.168.1.54:8080/video')
     width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     while (True):
+        if len(target_ids) is 0:
+            print("END")
+            bot.doMove(0, 0)
+            bot.doRGBLedOnBoard(1, 0, 255, 0)
+            break
+
         ret, frame = vid.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # converts image to grayscale
         # aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
@@ -77,8 +86,10 @@ if __name__ == "__main__":
         if target in id_to_marker_info:
             diagonal = id_to_marker_info[target][1]
 
-            if diagonal > 300:
-                target_ids.pop()
+            if diagonal > 275:
+                print ("\n======================")
+                print ("POP HERE" + str(target_ids.pop()))
+                print ("\n======================")
                 turning_flag = True
 
         if target not in id_to_marker_info:
@@ -87,29 +98,48 @@ if __name__ == "__main__":
             continue
 
         id_x = id_to_marker_info[target][0][0]
-        # Turn bot until it middle middle. Then go straight
 
+        markerPixelDist = id_x - (width / 2)
 
-        print(str(id_x) + "," +  str(width))
-
-        if id_x - width / 2 < 20 and  id_x - width > -20:
-            turning_flag = False
-            straight_flag = True
-            print("SETTING TO STRAIGHT")
-
-        # If bot deviates from middle turn until we are back into middle middle
-        if id_x - width / 2 > 80 or idx - width < -80:
-            turning_flag = True
-            straight_flag = False
-            print("TURNING TO FIND MARKER")
-
-        if turning_flag:
-            bot.doMove(-100, 100)
-            print("TURNING")
-
-        if straight_flag:
+        if bot_state == 1:
             bot.doMove(100, 100)
-            print("GOING STRAIGHT")
+
+        if -20 < markerPixelDist and markerPixelDist < 20:
+            bot_state = 1
+            bot.doMove(100, 100)
+            print("GOING FORWARDS")
+            continue
+
+        if markerPixelDist < -80:
+            bot_state = 0
+            bot.doMove(100, -100)
+            print("TURNING LEFT TO CENTER")
+            continue
+
+        if markerPixelDist > 80:
+            bot_state = 0
+            bot.doMove(-100, 100)
+            print("TURNING RIGHT TO CENTER")
+            continue
+
+        # if  < 20 and  id_x - width > -20:
+        #     turning_flag = False
+        #     straight_flag = True
+        #     print("SETTING TO STRAIGHT")
+        #
+        # # If bot deviates from middle turn until we are back into middle middle
+        # if id_x - width / 2 > 80 or idx - width < -80:
+        #     turning_flag = True
+        #     straight_flag = False
+        #     print("TURNING TO FIND MARKER")
+        #
+        # if turning_flag:
+        #     bot.doMove(-100, 100)
+        #     print("TURNING")
+        #
+        # if straight_flag:
+        #     bot.doMove(100, 100)
+        #     print("GOING STRAIGHT")
 
 
 
@@ -132,6 +162,9 @@ if __name__ == "__main__":
         #         bot.doMove(100, 100)
 
     vid.release()
+    print ("EXIT PROGRAM")
+    quit()
+    #sys.exit()
 
     # img = cv2.imread(frame)
 
