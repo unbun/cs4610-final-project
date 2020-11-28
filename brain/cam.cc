@@ -1,6 +1,6 @@
 #include <vector>
 #include <iostream>
-#include <map> 
+#include <map>
 #include <math.h>
 #include <algorithm>
 
@@ -72,23 +72,23 @@ Given a cv::mat returns a map of {marker_id: (marker_center, marker_size)}.
 */
 map<int, pair<Posn, float>> detect_markers(Mat frame) {
     map<int, pair<Posn, float>> marker_id_to_info;
-    
+
     if (frame.size().width < 1) {
         return marker_id_to_info;
     }
     cv::Mat greyMat;
     cv::cvtColor(frame, greyMat, cv::COLOR_BGR2GRAY);
-    
+
     std::vector<int> markerIds;
     std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
     cv::aruco::detectMarkers(greyMat, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
     cv::Mat outputImage = greyMat.clone();
     cv::aruco::drawDetectedMarkers(outputImage, markerCorners, markerIds);
-    
+
     for (int i = 0; i < markerIds.size(); i++) {
         marker_id_to_info.insert(
             pair<int, pair<Posn, int>>(
-                markerIds.at(i), 
+                markerIds.at(i),
                 pair<Posn, int>(
                     get_marker_center(markerCorners.at(i)),
                     get_marker_size(markerCorners.at(i))
@@ -105,6 +105,7 @@ map<int, pair<Posn, float>> detect_markers(Mat frame) {
     cv::waitKey(1);
     return marker_id_to_info;
 }
+
 
 /*
 Given a translation vector, calculates the 3D distance it is away.
@@ -125,10 +126,10 @@ map<int, pair<float, cv::Vec3d>> get_real_world_marker_position(
     Mat frame, cv::Mat cameraMatrix, cv::Mat distCoeffs) {
 
     double MARKER_SIZE = 1; // change as necessary
-    
+
     cv::Mat greyMat;
     cv::cvtColor(frame, greyMat, cv::COLOR_BGR2GRAY);
-    
+
     std::vector<int> markerIds;
     std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
     cv::aruco::detectMarkers(greyMat, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
@@ -141,7 +142,7 @@ map<int, pair<float, cv::Vec3d>> get_real_world_marker_position(
     for (int i = 0; i < markerIds.size(); i++) {
         real_world_marker_positions.insert(
             pair<int, pair<float, cv::Vec3d>>(
-                markerIds.at(i), 
+                markerIds.at(i),
                 pair<float, cv::Vec3d>(
                     calculate_distance(tvecs.at(i)),
                     rvecs.at(i)

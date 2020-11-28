@@ -10,7 +10,7 @@ Gets video feed from IP camera app. Tested with android.
 Haven't implemented the aruco detection yet
 """
 
-vid = cv2.VideoCapture('IP URL')  # replace IP URL with given url in app
+vid = cv2.VideoCapture('https://192.168.1.54:8080/video')  # replace IP URL with given url in app
 
 while (True):
     ret, frame = vid.read()
