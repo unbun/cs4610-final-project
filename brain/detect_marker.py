@@ -1,4 +1,3 @@
-
 import sys
 sys.path.append('/home/sloshymarcos111/.local/lib/python2.7/site-packages')
 import cv2
@@ -9,7 +8,7 @@ from mBot import *
 aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_50)
 parameters = aruco.DetectorParameters_create()
 
-target_ids = [5, 4, 3, 2, 1, 0]
+target_ids = [5, 4, 3, 2, 1, 0]  # aruco marker ID list  
 
 def get_center(corner):
     return np.mean(corner[0], axis=0)
@@ -54,9 +53,9 @@ bot_state = 0
 if __name__ == "__main__":
 
     bot = mBot()
-    bot.startWithSerial("/dev/ttyUSB0")
+    bot.startWithSerial("/dev/ttyUSB0")  # connection to mBot Ranger via serial
 
-    vid = cv2.VideoCapture('https://192.168.1.54:8080/video')
+    vid = cv2.VideoCapture('https://192.168.1.54:8080/video')  # replace with IP camera url with '/video' attached
     width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     while (True):
         if len(target_ids) is 0:
@@ -67,15 +66,11 @@ if __name__ == "__main__":
 
         ret, frame = vid.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # converts image to grayscale
-        # aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
         id_to_marker_info = detect_markers(gray)
-        # corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
         if not id_to_marker_info:
             bot.doMove(-100, 100)
             continue
-
-        # print(id_to_marker_info)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -92,15 +87,19 @@ if __name__ == "__main__":
                 print ("\n======================")
                 turning_flag = True
 
+		# if the target id has not been detected, then turn to find
         if target not in id_to_marker_info:
             bot.doMove(-100, 100)
             print("TURNING TO FIND MARKER")
             continue
 
+		# get aruco center horizontal coordinate
         id_x = id_to_marker_info[target][0][0]
 
+		# get aruco center to center of frame distance
         markerPixelDist = id_x - (width / 2)
 
+		# if aruco center is within threshold, continue straight	
         if bot_state == 1:
             bot.doMove(100, 100)
 
@@ -109,62 +108,22 @@ if __name__ == "__main__":
             bot.doMove(100, 100)
             print("GOING FORWARDS")
             continue
-
+		
+		# if aruco center is to left of center frame, turn left
         if markerPixelDist < -80:
             bot_state = 0
             bot.doMove(100, -100)
             print("TURNING LEFT TO CENTER")
             continue
 
+		# if aruco center is to right of center frame, turn right
         if markerPixelDist > 80:
             bot_state = 0
             bot.doMove(-100, 100)
             print("TURNING RIGHT TO CENTER")
             continue
 
-        # if  < 20 and  id_x - width > -20:
-        #     turning_flag = False
-        #     straight_flag = True
-        #     print("SETTING TO STRAIGHT")
-        #
-        # # If bot deviates from middle turn until we are back into middle middle
-        # if id_x - width / 2 > 80 or idx - width < -80:
-        #     turning_flag = True
-        #     straight_flag = False
-        #     print("TURNING TO FIND MARKER")
-        #
-        # if turning_flag:
-        #     bot.doMove(-100, 100)
-        #     print("TURNING")
-        #
-        # if straight_flag:
-        #     bot.doMove(100, 100)
-        #     print("GOING STRAIGHT")
-
-
-
-        # if target not in id_to_marker_info:
-        #     bot.doMove(-100, 100)
-        #     print ("finding marker: turn right\n")
-        #
-        # if target in id_to_marker_info:
-        #     id_x = id_to_marker_info[target][0][0]
-        #
-        #     if id_x - width / 2 > 10:
-        #         print ("found marker: centering turing right\n")
-        #         bot.doMove(100, -100)
-        #
-        #     if id_x - width / 2 < -10:
-        #         print ("found marker: centering turning left\n")
-        #         bot.doMove(-100, 100)
-        #     else:
-        #         print ("found marker: centered go straight\n")
-        #         bot.doMove(100, 100)
-
     vid.release()
     print ("EXIT PROGRAM")
     quit()
-    #sys.exit()
-
-    # img = cv2.imread(frame)
 

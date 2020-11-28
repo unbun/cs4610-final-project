@@ -3,22 +3,20 @@
 #include <time.h>
 #include <vector>
 #include <map>
-#include <fstream>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <string>
 
+#include "robot.hh"
 #include "cam.hh"
 
 using namespace std;
 using std::vector;
 
 map<int, pair<Posn, float>> marker_id_to_info;
-vector <int> IDs{6, 5, 4, 3, 2, 1, 0};
+vector <int> IDs{5, 4, 3, 2, 1, 0};  // aruco target IDs
 
-
+/**
+* Function for printing the map of detected aruco markers and their 
+* properties.
+*/
 void print_map() {
     map<int, pair<Posn, float>>::iterator itr; 
     cout << "\nDetected Markers\n";
@@ -28,6 +26,10 @@ void print_map() {
     } 
 }
 
+/**
+* Function that returns a true or false value based on the detection of the 
+* target_id argument input.
+*/
 bool detected_target_id(int target_id) {
 	
 	map<int, pair<Posn, float>>::iterator itr; 
@@ -41,103 +43,93 @@ bool detected_target_id(int target_id) {
 	return false;
 }
 
-string callback(cv::Mat frame)
+/**
+* Robot callback
+*/
+void callback(Robot* robot)
 {
-	marker_id_to_info = detect_markers(frame);
+	// check if all targets have been visited (empty target ID array)
+	if (IDs.empty())
+	{
+		cout << "=========================" << endl;
+		cout << "==== ALL IDs VISITED ====" << endl;
+		cout << "=========================" << endl;
+		return;
+	} 
+
+    marker_id_to_info = detect_markers(robot->frame);
     //print_map();
 
-	// current target aruco ID
-	float target_id = IDs.back();
+	float target_id = IDs.back();  // current aruco target ID
 	cout << "target_id: " << target_id <<endl;
 
 	// if the ID is not detected keep rotating
-	if (!detected_target_id(target_id))
-	{
-		cout << "not detected: turning" << endl;
-		
-		//robot->set_vel(-1, -1);
+	bool detected = detected_target_id(target_id);
+	if (!detected)
+	{	
+		cout << "TURNING TO FIND MARKER" << endl;
+		robot->set_vel(-1, 1);
 	}
 
+	bool straight_flag = false;  // on if set to go straight
+	bool turning_flag = false;  // on if set to turn
 	Posn target_pos = marker_id_to_info[target_id].first; // target position
 	float target_diag = marker_id_to_info[target_id].second; // target aruco diagonal length
 
-	// if  the target diagonal size is more than a threshold, pop the target ID and go to the next one	
+	// if  the target diagonal size is more than a threshold, pop the target ID
+	// and set next target ID
+	// the target has now been visited
 	if (target_diag > 300)
 	{
 		IDs.pop_back();
 	}
 
-	printf("target pos: %.2f, %.2f)\n", target_pos.first, target_pos.second);
-	// go to ID 1
-	//cout << "dim: " <<  target_pos.first - robot->frame.size().width/2 << endl;
-	//cout << "width: " << robot->frame.size().width << endl;
-	if (target_pos.first - frame.size().width/2 > 10)
+	printf("target coordinates: (%.2f, %.2f)\n", target_pos.first, target_pos.second);
+	cout << "aruco center to frame center distance: " <<  target_pos.first - robot->frame.size().width/2 << endl;
+
+	// if the target ID is detected then center it on the frame and go straight
+	if (detected==1)
 	{
-		cout << "turing right" << endl;
-		//robot->set_vel(1, -1);
-		return "1 -1";
-	}
+		// if the the horizontal coordinate of the center of the target marker 
+		// is inside a certain threshold, set to go straight
+		if (((target_pos.first - robot->frame.size().width/2 < 20) && target_pos.first - robot->frame.size().width/2 > -20))
+		{
+			cout << "SETTING TO STRAIGHT" << endl;
+			turning_flag = false;
+			straight_flag = true;
+			robot->set_vel(-1, 1);
+		} 
+		
+		// if the horizontal coordinate of the center of the target marker is 
+		// outside a certain threshold, set to turn
+		if (((target_pos.first - robot->frame.size().width/2 > 80) || target_pos.first - robot->frame.size().width/2 < -80))
+		{
+			turning_flag = true;
+			straight_flag = false;
+			cout << "TURNING TO FIND MARKER" << endl;
+		}
 
-	if (target_pos.first - frame.size().width/2 < -10)
-	{
-		cout << "turning left" << endl;
-		return "-1 1";
-		//robot->set_vel(-1, 1);
-		/* remove the FIFO */
-
-	}
-
-	else
-	{
-		cout << "found: going straight" << endl;
-
-		return "2 2";
-
-		//robot->set_vel(2, 2);
-
+		// turn
+		if (turning_flag==1)
+		{
+			robot->set_vel(-1, 1);
+		}
+		// go straight
+		if (straight_flag==1)
+		{
+			robot->set_vel(2, 2);
+		}
 	}
 }
 
 int
 main(int argc, char* argv[])
 {
-	cv::VideoCapture inputVideo;
-	inputVideo.open("https://172.20.10.11:8080/video");
-	
-	cv::Mat frame;
-
-    cout << "here1" <<endl;
     cam_init();
 
-	int fd; 
-  
-    // FIFO file path 
-    char * myfifo = "/tmp/myfifo"; 
-  
-    // Creating the named file(FIFO) 
-    // mkfifo(<pathname>, <permission>) 
-    mkfifo(myfifo, 0666); 
-
-    while (inputVideo.grab()) 
-    { 
-		inputVideo.read(frame);
-        // Open FIFO for write only 
-        fd = open(myfifo, O_WRONLY); 
-  
-        // Take an input arr2ing from user. 
-        // 80 is maximum length 
-		std::string str = callback(frame);
-		char* arr2 = new char[str.size() + 1];
-		std::copy(str.begin(), str.end(), arr2);
-		arr2[str.size()] = '\0';
-  
-        // Write the input arr2ing on FIFO 
-        // and close it 
-        write(fd, arr2, strlen(arr2)+1); 
-        close(fd); 
-  }
-    //Robot robot(argc, argv, callback);
-    //robot.do_stuff();
+    cout << "making robot" << endl;
+    Robot robot(argc, argv, callback);
+    robot.do_stuff();
 
     return 0;
 }
