@@ -1,0 +1,75 @@
+﻿Questions for Robotics Final Project
+
+
+This file should be filled in once for your team and submitted once each to the three project assignments: Code, Demo, Presentation
+
+
+Make sure to answer all the questions here to qualify for full project credit.
+
+
+1. What are the names of all members of your team?
+* Nikhil Bhat
+* Ho Yat Aaron Ng
+* Unnas Hussain
+* Marcos Rodriguez
+
+
+2. In no more than three sentences, what was your project?
+* Our project develops a fiducial marker based system for robot navigation. The user can place ArUco markers around an environment, and the robot will perform vision based analysis using an onboard camera to travel to the markers in a user-defined order. 
+
+
+3. What did each team member do to contribute to the project?
+* Nikhil Bhat:
+   * I developed all of the vision processing code to take an image and produce:
+      * the Aruco markers in the image
+      * the marker size 
+      * the marker centers. 
+   * Replicated the vision processing code in Python to facilitate communication with the real world system.
+   * I also developed the code to generate a Gazebo world file from a text file and shared this on Piazza for a bonus point. 
+   * I helped get the Aruco markers into the Gazebo world.  
+* Ho Yat Aaron Ng:
+   * Developed the gazebo world and implemented Aruco markers into the Gazebo world
+   * Integrated the individual components for the  full stack physical robot into one cohesive program, from camera to movement
+   * Wrote the code for the physical robot movement. The physical robot required a greater tolerance boundary and error correction
+* Unnas Hussain:
+   * Developed the Python code for communication between central computer and Auriga board
+      * Based on makeblock libraries, I researched auriga-specific communication protocols
+      * Auriga board communication proved to be really finicky, as the mBot Ranger is not designed to be used at such a low level.
+      * Created connection between auriga and central computer (attempted bluetooth, eventually settled on secure USB)
+   * Developed a system to debug Gazebo code by manually controlling the robot with keyboard control
+* Marcos Rodriguez
+   * Developed Python code for real world robot control in demo
+      * Using Makeblock Python library
+   * Developed C++ code for robot control in Gazebo simulation
+      * Using tank bot files from previous assignments
+   * Executed demonstrations 
+
+
+4. What is the URL of your git repository with all your project code and your
+presentation notes / slides?
+* https://github.com/NikhilCBhat/cs4610-final-project
+
+
+5. Which component do you think was the most innately difficult to build?
+* The vision processing code was the most difficult technical challenge. Getting communication between the vision processing code and the arugo board was the most difficult part to debug. 
+* Integrating the physical robot with our gazebo code required special care due to some incompatibility between the Auriga and our low-level software
+
+
+6. What's the URL to your Demo video?
+
+
+
+
+7. What's the URL to your Presentation video?
+
+
+
+
+8. Did you share any generally useful example code with other teams to try for
+a bonus point? If so, what's the Git repo and Piazza post URLs?
+* Simplifying the Gazebo World Generation Process
+   * https://piazza.com/class/kcnltmm0pvf6l?cid=115
+   * https://github.com/NikhilCBhat/cs4610-worldgen
+* Manual Control of Gazebo Robot with Keys
+   * https://piazza.com/class/kcnltmm0pvf6l?cid=139
+   * https://github.com/unbun/gazebo-keyctrl
