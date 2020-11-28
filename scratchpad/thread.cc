@@ -1,3 +1,8 @@
+
+/**
+Test file for re-learning how threading works in c
+**/
+
 #include <string>
 #include <iostream>
 #include <thread>

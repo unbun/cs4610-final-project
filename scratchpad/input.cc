@@ -1,13 +1,13 @@
-/*
-Based of a solution from:
-https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
-*/
 
+/**
+Test file displaying the general concept of reading keyboard input
+from the terminal
+**/
 #include <stdio.h>
 #include <stdlib.h>
 
 
-int main() {
+int input_loop() {
    
     char ch;
     system("stty raw");
