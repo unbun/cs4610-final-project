@@ -5,6 +5,9 @@ from cv2 import aruco
 import numpy as np
 from mBot import *
 
+#     Note: The OpenCV code is based off of the OpenCV tutorials
+#     that are linked in the README
+
 aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_50)
 parameters = aruco.DetectorParameters_create()
 

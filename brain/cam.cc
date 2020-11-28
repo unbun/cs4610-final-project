@@ -15,7 +15,7 @@ using namespace cv;
 using namespace std;
 
 /*
-    Note: A lot of the OpenCV code is based off of the OpenCV tutorials
+    Note: The OpenCV code is based off of the OpenCV tutorials
     that are linked in the README 
 */
 
