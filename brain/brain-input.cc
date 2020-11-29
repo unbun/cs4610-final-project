@@ -1,4 +1,4 @@
-// replace brain.cc with this file to use it
+// replace brain.cc with this file to use keyboard control
 
 #include <iostream>
 #include <math.h>
@@ -20,6 +20,9 @@ float minSpeed = -10.0f;
 // BUGFIX: the actual set_vel call happens when you'd expect it to,
 // but the vel_cmd Publisher node seems to be getting its message after a small delay _sometimes_
 
+// drive the given robot based on the given keyboard cmd 
+// wasd to drive, qe to spin, space to stop
+// ~ to terminate
 void drive(Robot* robot, char cmd) {
 	switch(cmd){
 		case 'w': 
@@ -72,7 +75,7 @@ void callback(Robot* robot)
 
     char ch = getchar();
 
-    if(ch=='~') {         // kill on '~'
+    if(ch=='~') { // kill on '~'
         system("stty cooked");
         exit(0); // /BUGFIX: maybe do this more gracefully?
     }
@@ -94,6 +97,6 @@ main(int argc, char* argv[])
 
     robot.do_stuff();
 
-    system("stty cooked"); 
+    system("stty cooked"); // always switch back to cooked at the end
     return 0;
 }

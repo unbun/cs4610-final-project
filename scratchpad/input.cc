@@ -1,8 +1,8 @@
-
 /**
 Test file displaying the general concept of reading keyboard input
 from the terminal
 **/
+
 #include <stdio.h>
 #include <stdlib.h>
 

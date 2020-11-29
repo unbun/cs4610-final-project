@@ -3,7 +3,7 @@
 
 Our project goal is to develop a physical robot and control program that can precisely navigate a modular, 3D environment. Given an ordered list of target ids, the robot’s goal will be to visit all targets in the environment. Using a mounted phone as a camera, the robot will detect the visual targets and begin navigating towards the first target. The robot will repeat the cycle of detection and navigation until all targets have been visited.
 
-## Gazebo World Generation
+## Bonus Point: Gazebo World Generation
 
 The most helpful functions are:
 
@@ -12,9 +12,9 @@ The most helpful functions are:
 
 Generating a gazebo worldfile can be a bit tricky. This code simplifies this process, by providing helpful functions to set up a world file, and even generate one from a txt file.
 
-## Manually controlled Gazebo robot
+## Bonus Point: Manually controlled Gazebo robot
 
-`brain-input.cc` contains a simulation setup and manual control program for a simple Gazebo tankbot. To change the velocity of the robot, hold down the corresponding key, and the Gazebo robot will follow that command. The command keys are as setup as following:
+`brain-input.cc` contains a simulation setup and manual control program for a simple Gazebo tankbot. To change the velocity of the robot, hold down the corresponding key, and the Gazebo robot will follow that command. Replace `brain.cc` with this file and run `make` to use it. The command keys are as setup as following:
 
 - `w`: Forward
 - `s`: Reverse

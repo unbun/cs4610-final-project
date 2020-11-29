@@ -2,6 +2,10 @@ from lib.mBot import *
 from multiprocessing import Process,Manager,Array
 import threading
 from time import sleep
+
+# Attribution:
+# https://github.com/xeecos/python-for-mbot/tree/master
+
 dev = None
 hidapi = hid()
 hidapi.hid_init()

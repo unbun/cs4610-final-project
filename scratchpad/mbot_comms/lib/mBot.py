@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*
+# Attribution:
+# https://github.com/xeecos/python-for-mbot/tree/master
+# xeecos made a majority of these classes. We 
+#   tuned the movement methods and rgbled methods
+#   as needed and for testing connections
 
 import serial
 import sys,time
