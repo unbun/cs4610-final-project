@@ -3,6 +3,29 @@
 
 Our project goal is to develop a physical robot and control program that can precisely navigate a modular, 3D environment. Given an ordered list of target ids, the robot’s goal will be to visit all targets in the environment. Using a mounted phone as a camera, the robot will detect the visual targets and begin navigating towards the first target. The robot will repeat the cycle of detection and navigation until all targets have been visited.
 
+# Running the project
+
+## Gazebo
+1. If you wish the modify the world, update the /mazegen/final.txt
+2. In /mazegen, run: ```python3 gen_world.py```
+3. Compile all the code, run: ```make all```
+4. In a new terminal, run gazebo world: ```./run_world```
+5. In a new terminal, run inside /brain: ```./brain```
+6. Watch the demo execute in gazebo simulation
+
+## Real World
+
+### Updating Python Paths in real_world_brain.py
+1. Update sys.path (line 2) to the local system package of python2.7 opencv
+2. Update the correct USB port (line 59) of the mBot ranger. You can use Arduino IDE or terminal to find the correct port number
+3. Update video capture input (line 61) to the URL of the IP Camera
+
+### Updating mbot firmware
+1. Plug in mBot ranger into computer and open up mBlock app. Upload the latest firmware to the bot
+
+### Running the script
+1. Run the python script in /brain: ```sudo python real_world_brain.py```
+
 ## Bonus Point: Gazebo World Generation
 
 The most helpful functions are:
