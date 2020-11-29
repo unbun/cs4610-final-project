@@ -29,3 +29,5 @@ Generating a gazebo worldfile can be a bit tricky. This code simplifies this pro
 - https://github.com/joselusl/aruco_gazebo [For Aruco Models]
 - https://stackoverflow.com/questions/10344246/how-can-i-convert-a-cvmat-to-a-gray-scale-in-opencv
 - https://docs.opencv.org/master/d5/dae/tutorial_aruco_detection.html [For Aruco Detection]
+- https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed [For keyboard control]
+- https://github.com/xeecos/python-for-mbot [For mBot Ranger python commands (mbot.py)]
