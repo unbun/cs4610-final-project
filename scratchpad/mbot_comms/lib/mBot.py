@@ -5,7 +5,6 @@
 #   tuned the movement methods and rgbled methods
 #   as needed and for testing connections
 
-
 import serial
 import sys,time
 import signal
@@ -21,7 +20,7 @@ class mSerial():
         sleep(0)
 
     def start(self, port):
-        self.ser = serial.Serial(port,115200)
+        self.ser = serial.Serial(port, 115200)
     
     def device(self):
         return self.ser
@@ -58,7 +57,7 @@ class mSerial():
 
     def close(self):
         self.ser.close()
-       
+        
 class mHID():
     def __init__(self):
         sleep(0)
@@ -155,6 +154,9 @@ class mBot():
                 
     def __writePackage(self,pack):
         self.device.writePackage(pack)
+
+    def doCustomMessage3(self, data1, data2, data3):
+        self.__writePackage(bytearray[0xff, 0x55, 0x4, 0x0, data1, data2, data3])
 
     def doRGBLed(self,port,slot,index,red,green,blue):
         self.__writePackage(bytearray([0xff,0x55,0x9,0x0,0x2,0x8,port,slot,index,red,green,blue]))
