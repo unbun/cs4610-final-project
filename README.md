@@ -21,7 +21,7 @@ Our project goal is to develop a physical robot and control program that can pre
 3. Update video capture input (line 61) to the URL of the IP Camera
 
 ### Updating mbot firmware
-1. Plug in mBot ranger into computer and open up mBlock app. Upload the latest firmware to the bot
+1. Plug in mBot ranger into computer and open up mBlock app. Upload the latest firmware for the Auriga of the mbot Ranger ([Linked here](https://github.com/Makeblock-official/Makeblock-Libraries/blob/master/examples/Firmware_for_Auriga/Firmware_for_Auriga.ino))
 
 ### Running the script
 1. Run the python script in /brain: ```sudo python real_world_brain.py```
