@@ -1,7 +1,7 @@
 
 # Vision-Guided Robotic Navigation in Modular 3D Space
 
-Our project goal is to develop a physical robot and control program that can precisely navigate a modular, 3D environment. Given an ordered list of target ids, the robot’s goal will be to visit all targets in the environment. Using a mounted phone as a camera, the robot will detect the visual targets and begin navigating towards the first target. The robot will repeat the cycle of detection and navigation until all targets have been visited.
+Our project goal is to develop a physical robot and control program that can precisely navigate a modular, 3D environment. Given an ordered list of target ids, the robot’s goal will be to visit all targets in the environment. Using a mounted phone as a camera, the robot will detect the visual targets and begin navigating towards the first target. The robot will repeat the cycle of detection and navigation until all targets have been visited. [Link to demo video](https://www.youtube.com/watch?v=5uiuzLLQ6lY&t=152s)
 
 # Running the project
 
